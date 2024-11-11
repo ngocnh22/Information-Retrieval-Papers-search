@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Information Retrieval System</title>
+</head>
+<body>
+    <h1>Information Retrieval System</h1>
+
+    <!-- Search Form -->
+    <form action="/" method="get">
+        <label for="query">Search Query:</label>
+        <input type="text" name="query" id="query" value="{{ query }}" required>
+        
+        <label for="search_by">Search By:</label>
+        <select name="search_by" id="search_by">
+            <option value="title" {% if search_by == 'title' %}selected{% endif %}>Title</option>
+            <option value="authors" {% if search_by == 'authors' %}selected{% endif %}>Authors</option>
+            <option value="publication_date" {% if search_by == 'publication_date' %}selected{% endif %}>Publication Date</option>
+            <option value="keyword" {% if search_by == 'keyword' %}selected{% endif %}>Keyword (Title, Abstract, Authors)</option>
+        </select>
+        
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Display Precision and Recall -->
+    <h2>Evaluation Metrics</h2>
+    <p><strong>Precision:</strong> {{ precision }}</p>
+    <p><strong>Recall:</strong> {{ recall }}</p>
+    <p><strong>F1-Score:</strong> {{ f1_score }}</p>
+
+
+    <!-- Display Search Results -->
+    <h2>Search Results</h2>
+    {% if papers %}
+        <table border="1">
+            <tr>
+                <th>Title</th>
+                <th>Authors</th>
+                <th>Publication Date</th>
+                <th>Abstract</th>
+            </tr>
+            {% for paper in papers %}
+                <tr>
+                    <td><a href="{{ url_for('paper_detail', paper_id=paper[0]) }}">{{ paper[1] }}</a></td>
+                    <td>{{ paper[3] }}</td>
+                    <td>{{ paper[4] }}</td>
+                    <td>{{ paper[2] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Pagination -->
+        <div>
+            {% if current_page > 1 %}
+                <a href="?query={{ query }}&search_by={{ search_by }}&page={{ current_page - 1 }}">Previous</a>
+            {% endif %}
+            Page {{ current_page }} of {{ total_pages }}
+            {% if current_page < total_pages %}
+                <a href="?query={{ query }}&search_by={{ search_by }}&page={{ current_page + 1 }}">Next</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>No papers found.</p>
+    {% endif %}
+
+    <!-- Add New Paper -->
+    <h2>Add New Paper</h2>
+    <form action="/add_paper" method="post">
+        <label for="title">Title:</label>
+        <input type="text" name="title" id="title" required><br>
+        
+        <label for="abstract">Abstract:</label>
+        <textarea name="abstract" id="abstract" required></textarea><br>
+
+        <label for="authors">Authors:</label>
+        <input type="text" name="authors" id="authors" required><br>
+
+        <label for="publication_date">Publication Date:</label>
+        <input type="date" name="publication_date" id="publication_date" required><br>
+
+        <button type="submit">Add Paper</button>
+    </form>
+</body>
+</html>
